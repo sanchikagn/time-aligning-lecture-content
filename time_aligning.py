@@ -1,14 +1,15 @@
 import pandas as pd
-from itertools import islice
+from title_duration import converting_to_topic_classes
 from convert_to_pdf import PDF
 
+converting_to_topic_classes()
 # Inspecting data
 audio_transcript = pd.read_csv('resources/lecture_1.csv', sep=',', header=None,
                                names=['label', 'start', 'end', 'text'], converters={'label': str, 'text': str})
 # print("Input data has {} rows and {} columns".format(len(audio_transcript), len(audio_transcript.columns)))
 # print(audio_transcript.info())
 
-lecture_titles = pd.read_csv('resources/lecture_1_titles.csv', sep=',', header=None, names=['time', 'text'])
+lecture_titles = pd.read_csv('resources/title_duration.csv', sep=',', header=None, names=['start', 'end', 'text'])
 # print("Input data has {} rows and {} columns".format(len(lecture_titles), len(lecture_titles.columns)))
 # print(lecture_titles.info())
 
@@ -42,33 +43,15 @@ pdf_doc.set_title('Theory of Computation' + '\n' + 'Chapter 1: Introduction')
 pdf_doc.set_author('Prof. Somenath Biswas')
 
 # The topic of the lecture
-# print(lecture_titles.iloc[0]['text'] + '\n')
-
-# First topic
-# print(lecture_titles.iloc[1]['text'])
-
-# Align text
-# def segmenting_text():
-#     return 0
-
-
-# Align image
-# def adding_images():
-#     return 0
-
-
-# Aligning content with topics
-# def align_all_content(content_label):
-#     return {
-#         'text': segmenting_text(),
-#         'image': adding_images()
-#     }[content_label]
+# print(lecture_titles.iloc[0]['text'])
 
 # General method for topic segmentation
-upper_limit_time = 0
-for index, column in islice(lecture_titles.iterrows(), 1, None):
-    time = (int(column[0][1:3]) * 60 + int(column[0][4:6])) * 1000
-    topic = column[1]
+lecture = pd.DataFrame(columns=['start', 'end', 'topic', 'content'])
+for index, column in lecture_titles.iterrows():
+    start = int(column[0])
+    end = int(column[1])
+    topic = column[2]
+    # pre_topic = topic
     topic_content = ''
     image_path = ''
     for index_content, column_content in all_lecture_content_sorted.iterrows():
@@ -77,22 +60,30 @@ for index, column in islice(lecture_titles.iterrows(), 1, None):
         if label == 'text':
             start_time = int(column_content[1])
             end_time = int(column_content[2])
-            if end_time > time:
-                upper_limit_time = time
+            if end_time >= end:
+                topic_content = topic_content + column_content[3] + ' '
                 break
-            elif start_time > upper_limit_time:
+            elif start_time >= start:
                 topic_content = topic_content + column_content[3] + ' '
             else:
                 continue
         elif label == 'image':
             image_name = str(column_content[4])
             image_path = 'resources/images/lecture_1/' + image_name
-    print(topic_content) if topic_content != ' ' else print('')
-    print(image_path)
-    pdf_doc.print_chapter(index, topic, topic_content + '\n\n', image_path)
-    print('\n')
-    print(topic)
+
+    # adding to lecture df
+    lecture = lecture.append({'start': start, 'end': end, 'topic': topic, 'content': topic_content},
+                             ignore_index=True)
+
+    # creating the pdf
+    pdf_doc.print_chapter(index, topic, topic_content + '\n', image_path)
+    # print(topic)
+    # print(topic_content) if topic_content != '' else print('')
+    # print(image_path)
+    # print('\n')
 
 # Create a PDF file
 pdf_doc.add_page()
 pdf_doc.output('lecture_note.pdf', 'F')
+
+print(lecture)
