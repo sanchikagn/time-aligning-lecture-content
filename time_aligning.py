@@ -21,7 +21,6 @@ def aligning_content():
     # print("Input data has {} rows and {} columns".format(len(lecture_images), len(lecture_images.columns)))
     # print(lecture_images.info())
 
-
     # Acquiring the entire audio transcript
     # lecture_text = ''
     # for index, column in audio_transcript.iterrows():
@@ -59,7 +58,7 @@ def entire_lecture(audio_transcript, lecture_images):
 
 # General method for topic segmentation
 def topic_segmentation(lecture_titles, all_lecture_content_sorted, pdf_doc):
-    lecture = pd.DataFrame(columns=['start', 'end', 'topic', 'content'])
+    lecture = pd.DataFrame(columns=['start', 'end', 'topic', 'content', 'images'])
     for index, column in lecture_titles.iterrows():
         start = int(column[0])
         end = int(column[1])
@@ -86,7 +85,7 @@ def topic_segmentation(lecture_titles, all_lecture_content_sorted, pdf_doc):
 
         # adding to lecture df
         lecture = lecture.append({'start': start, 'end': end, 'topic': topic, 'content': topic_content,
-                                  'image': image_path}, ignore_index=True)
+                                  'images': image_path}, ignore_index=True)
 
         # creating the pdf
         pdf_doc.print_chapter(index, topic, topic_content + '\n', image_path)
