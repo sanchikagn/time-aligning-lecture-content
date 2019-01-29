@@ -1,31 +1,25 @@
 import nltk
 
-from content_preprocessing import preprocessing_content
 from time_aligning import aligning_content
+import pandas as pd
+
+lecture_content = aligning_content()
+# print(lecture_content['content'])
+# Considering sentences
 
 
-# Topic-wise content
-basic_lecture_content = aligning_content()
-# print(basic_lecture_content)
-
-# Pre-processing content
-lecture_analyzing = preprocessing_content(basic_lecture_content)
-# print(lecture_analyzing['content'])
-
-
-# Extracting features i.e. n-grams in each topic
-def feature_extraction(preprocessed_text):
-    bigrams = []
-    unigrams_lists = []
-    # adding end of and start of a message
-    # msg = '<s> ' +msg + ' </s>'
-    unigrams_lists.append(preprocessed_text.split())
-    unigrams = [uni_list for sub_list in unigrams_lists for uni_list in sub_list]
-    bigrams.extend(nltk.bigrams(unigrams))
-    return bigrams
-
-
-topic_features = lecture_analyzing['topic'] = lecture_analyzing['topic'].apply(lambda topic: feature_extraction(topic))
-content_features = lecture_analyzing['content'] = lecture_analyzing['content'].apply(lambda content:
-                                                                                     feature_extraction(content))
-print(topic_features)
+# def extract_sentences(content):
+#
+#
+# basic_lecture_content = aligning_content()
+# bigrams_for_sentence = list(nltk.bigrams(basic_lecture_content))
+#
+# content_sentences = pd.DataFrame(columns=['start', 'end', 'topic', 'content', 'images'])
+# # content_sentences = pd.DataFrame(columns=['start', 'content'])
+# content_sentences['start'] = lecture_content['start']
+# content_sentences['end'] = lecture_content['end']
+# content_sentences['topic'] = lecture_content['topic']
+# content_sentences['content'] = lecture_content['content'].apply(lambda content: extract_sentences(content))
+# content_sentences['images'] = lecture_content['images']
+# print(content_sentences['content'])
+# print(content_sentences)
