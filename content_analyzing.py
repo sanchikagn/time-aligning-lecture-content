@@ -1,12 +1,14 @@
 import nltk
 
 from time_aligning import aligning_content
+from content_features import content_features_extraction
 import pandas as pd
 
 lecture_content = aligning_content()
-# print(lecture_content['content'])
-# Considering sentences
+print(lecture_content['bigrams'])
 
+features_for_topic = content_features_extraction()
+# print(features_for_topic[0])
 
 # def extract_sentences(content):
 #

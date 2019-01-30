@@ -1,16 +1,8 @@
 import nltk
+import pandas as pd
 
 from content_preprocessing import preprocessing_content
 from time_aligning import aligning_content
-
-
-# Topic-wise content
-basic_lecture_content = aligning_content()
-# print(basic_lecture_content)
-
-# Pre-processing content
-lecture_analyzing = preprocessing_content(basic_lecture_content)
-# print(lecture_analyzing['content'])
 
 
 # Extracting features i.e. n-grams in each topic
@@ -51,16 +43,26 @@ def bigram_feature_frequency(bigrams):
     return bigram_frequency
 
 
-topic_features = lecture_analyzing['topic'].apply(lambda topic: feature_extraction(topic))
-if topic_features is not None:
-    topic_features = topic_features.apply(lambda topic: filter_stopwords_bigrams(topic))
-# topic_frequency = topic_features.apply(lambda bigrams: bigram_feature_frequency(bigrams))
+def content_features_extraction():
+    # Topic-wise content
+    basic_lecture_content = aligning_content()
+    # print(basic_lecture_content)
 
-content_features = lecture_analyzing['content'].apply(lambda content: feature_extraction(content))
-if content_features is not None:
-    content_features = content_features.apply(lambda bigrams: filter_stopwords_bigrams(bigrams))
-content_frequency = content_features.apply(lambda bigrams: bigram_feature_frequency(bigrams))
+    # Pre-processing content
+    lecture_analyzing = preprocessing_content(basic_lecture_content)
+    # print(lecture_analyzing['content'])
+    topic_features = lecture_analyzing['topic'].apply(lambda topic: feature_extraction(topic))
+    if topic_features is not None:
+        topic_features = topic_features.apply(lambda topic: filter_stopwords_bigrams(topic))
+    # topic_frequency = topic_features.apply(lambda bigrams: bigram_feature_frequency(bigrams))
 
-# print(topic_frequency)
-print(content_frequency)
+    content_features = lecture_analyzing['content'].apply(lambda content: feature_extraction(content))
+    if content_features is not None:
+        content_features = content_features.apply(lambda bigrams: filter_stopwords_bigrams(bigrams))
+    content_frequency = pd.DataFrame(columns=['bigrams'])
+    content_frequency['bigrams'] = content_features.apply(lambda bigrams: bigram_feature_frequency(bigrams))
 
+    # print(topic_frequency)
+    print(content_frequency)
+    # print(type(content_frequency))
+    return content_frequency
